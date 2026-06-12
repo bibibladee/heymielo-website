@@ -978,6 +978,14 @@
     </div>
   </section>
 
+  <!-- ROI CALCULATOR TRIGGER -->
+  <section style="padding: 60px 5%; text-align: center; background: #fafaf8;">
+    <p style="font-size: 13px; color: #aaa; font-family: 'DM Sans', sans-serif; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.06em;">Gratis berekenen</p>
+    <h2 style="font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; color: #111; font-family: 'Instrument Serif', serif; margin: 0 0 12px; line-height: 1.2;">Wat levert één ster extra<br>jou op?</h2>
+    <p style="font-size: 15px; color: #888; font-family: 'DM Sans', sans-serif; margin: 0 0 28px;">Vul je jaaromzet in en zie direct wat reviews doen voor jouw omzet.</p>
+    <button onclick="document.getElementById('roi-modal').style.display='flex'" style="background: #FF4D79; color: white; border: none; border-radius: 30px; padding: 14px 32px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif;">Bereken mijn potentiële omzet →</button>
+  </section>
+
   <!-- PRICING -->
   <section class="pricing" id="pricing">
     <div class="pricing-header">
@@ -1107,5 +1115,63 @@
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
   </script>
+  <!-- ROI CALCULATOR POPUP -->
+  <div id="roi-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:white; border-radius:20px; padding:40px; max-width:480px; width:100%; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+      <button onclick="document.getElementById('roi-modal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#aaa; line-height:1;">✕</button>
+
+      <p style="font-size:11px; font-weight:600; letter-spacing:0.08em; color:#FF4D79; text-transform:uppercase; margin:0 0 8px; font-family:'DM Sans',sans-serif;">Gratis berekenen</p>
+      <h3 style="font-size:1.6rem; font-weight:700; color:#111; font-family:'Instrument Serif',serif; margin:0 0 8px; line-height:1.2;">Wat levert één ster extra jou op?</h3>
+      <p style="font-size:13px; color:#888; font-family:'DM Sans',sans-serif; margin:0 0 28px; line-height:1.5;">Restaurants die consequent reageren op reviews zien gemiddeld een hogere beoordeling. Elke halve ster extra levert 5–9% meer omzet op (Harvard Business School).</p>
+
+      <label style="font-size:12px; font-weight:600; color:#555; font-family:'DM Sans',sans-serif; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.05em;">Wat is jouw jaaromzet?</label>
+      <div style="position:relative; margin-bottom:20px;">
+        <span style="position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:16px; color:#aaa; font-family:'DM Sans',sans-serif;">€</span>
+        <input id="roi-input" type="text" placeholder="300.000" oninput="calculateROI()" style="width:100%; padding:14px 16px 14px 32px; border:1.5px solid #e8e8e4; border-radius:12px; font-size:16px; font-family:'DM Sans',sans-serif; outline:none; box-sizing:border-box; transition:border-color 0.2s;" onfocus="this.style.borderColor='#FF4D79'" onblur="this.style.borderColor='#e8e8e4'">
+      </div>
+
+      <div id="roi-result" style="display:none; background:#fff5f7; border-radius:14px; padding:20px; margin-bottom:24px; text-align:center;">
+        <p style="font-size:12px; color:#FF4D79; font-family:'DM Sans',sans-serif; margin:0 0 4px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Jouw potentiële extra omzet</p>
+        <p id="roi-min" style="font-size:2rem; font-weight:700; color:#111; font-family:'DM Sans',sans-serif; margin:0 0 4px;"></p>
+        <p id="roi-range" style="font-size:13px; color:#888; font-family:'DM Sans',sans-serif; margin:0 0 12px;"></p>
+        <p style="font-size:12px; color:#888; font-family:'DM Sans',sans-serif; margin:0 0 12px; line-height:1.5;">Mielo helpt je die ster verdienen — automatisch, in jouw eigen schrijfstijl.</p>
+        <p id="roi-mielo" style="font-size:12px; color:#FF4D79; font-family:'DM Sans',sans-serif; margin:0; font-weight:500;"></p>
+      </div>
+
+      <button onclick="window.location.href='https://app.heymielo.com/auth/signup'" style="width:100%; background:#FF4D79; color:white; border:none; border-radius:30px; padding:14px; font-size:15px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;">14 dagen gratis proberen →</button>
+      <p style="text-align:center; font-size:11px; color:#bbb; font-family:'DM Sans',sans-serif; margin:10px 0 0;">Geen creditcard nodig · Maandelijks opzegbaar</p>
+    </div>
+  </div>
+
+  <script>
+    function calculateROI() {
+      const raw = document.getElementById('roi-input').value;
+      // Verwijder punten (duizendtalscheiders) en vervang komma door punt
+      const cleaned = raw.replace(/\./g, '').replace(',', '.');
+      const result = document.getElementById('roi-result');
+      const minEl = document.getElementById('roi-min');
+      const rangeEl = document.getElementById('roi-range');
+      const mieloEl = document.getElementById('roi-mielo');
+
+      if (!cleaned || isNaN(cleaned) || parseFloat(cleaned) <= 0) {
+        result.style.display = 'none';
+        return;
+      }
+
+      const omzet = parseFloat(cleaned);
+      const min = Math.round(omzet * 0.05);
+      const max = Math.round(omzet * 0.09);
+      const mielo = 49 * 12;
+
+      const fmt = (n) => '€' + n.toLocaleString('nl-NL');
+
+      minEl.textContent = fmt(min) + ' – ' + fmt(max);
+      rangeEl.textContent = 'per jaar bij 5–9% omzetgroei (Harvard Business School)';
+      mieloEl.textContent = 'Mielo kost je ' + fmt(mielo) + ' per jaar. Dat is ' + Math.round(min / mielo) + 'x–' + Math.round(max / mielo) + 'x terugverdiend.';
+
+      result.style.display = 'block';
+    }
+  </script>
+
 </body>
 </html>
